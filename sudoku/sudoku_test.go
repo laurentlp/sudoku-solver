@@ -1,6 +1,7 @@
 package sudoku_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/laurentlp/sudoku-solver/sudoku"
@@ -77,6 +78,37 @@ func TestPeers(t *testing.T) {
 	c2 := squarePeers["C2"]
 	if compareSlices2D(c2, unit) {
 		t.Error("An error occured while creating peers. Some returned values are wrong !")
+	}
+}
+
+func TestGrid(t *testing.T) {
+	grid := "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......" // 81 values
+	result := map[string]string{}
+
+	for i, s := range squares {
+		result[s] = string(grid[i])
+	}
+
+	values, err := sudoku.GridValues(grid)
+
+	if len(values) != len(grid) {
+		t.Error(err)
+	}
+
+	for k, v := range values {
+		if v != result[k] {
+			t.Error("Value is invalid. Expected a value of " + result[k] + " got one of " + v)
+		}
+	}
+}
+
+func TestGridErr(t *testing.T) {
+	grid := "4.....8.5.3..........7......2.....6.....8.4......1...." // 54 values
+
+	_, err := sudoku.GridValues(grid)
+
+	if err.Error() != ("Invalid grid size: expected grid size of 81 found grid size of " + fmt.Sprintf("%d", len(grid))) {
+		t.Error("An error was supposed to be returned")
 	}
 }
 

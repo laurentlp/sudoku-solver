@@ -1,5 +1,11 @@
 package sudoku
 
+import (
+	"errors"
+	"strconv"
+	"strings"
+)
+
 const digits string = "123456789"
 const rows string = "ABCDEFGHI"
 const cols string = digits
@@ -94,4 +100,32 @@ func CreatePeers(units map[string][][]string) map[string][]string {
 	}
 
 	return peers
+}
+
+// GridValues match all the sudoku values to its square
+func GridValues(grid string) (map[string]string, error) {
+	values := make(map[string]string, len(grid))
+	chars := make([]string, len(grid))
+
+	// For each square
+	for i := 0; i < len(grid); i++ {
+		// Value of the square
+		str := grid[i : i+1]
+		// Valid that the square value is a digit from 1 to 9 or '0' or '.' for empties
+		// and adds it to the sudoku list of values.
+		if strings.Contains(digits, str) || strings.Contains("0.", str) {
+			chars[i] = str
+		}
+	}
+
+	if len(chars) != 81 {
+		return nil, errors.New("Invalid grid size: expected grid size of 81 found grid size of " + strconv.Itoa(len(chars)))
+	}
+
+	// Map the square value to it's corresponding key (A1, B5, D8,...)
+	for i := 0; i < len(grid); i++ {
+		values[squares[i]] = chars[i]
+	}
+
+	return values, nil
 }
