@@ -1,2 +1,64 @@
 # sudoku-solver
+
+[![wercker status](https://app.wercker.com/status/3ee8307fdb3876b6c0f7a504caf5daef/s/master "wercker status")](https://app.wercker.com/project/byKey/3ee8307fdb3876b6c0f7a504caf5daef)
+[![Coverage Status](https://coveralls.io/repos/github/laurentlp/sudoku-solver/badge.svg)](https://coveralls.io/github/laurentlp/sudoku-solver)
+
 A simple golang sudoku solver using Peter Norvig algorithm
+
+## Installation
+
+```shell
+$ go get github.com/laurentlp/sudoku-solver
+```
+
+## Running the tests
+
+```shell
+$ cd $GOPATH/src/github.com/laurentlp/sudoku-solver
+$ go test -v ./...
+```
+
+## Basic using
+
+First create a go project in which you need a `main.go` file
+
+```golang
+    package main
+
+    import (
+        "fmt"
+
+        "github.com/laurentlp/sudoku-solver/sudoku"
+    )
+
+    func main() {
+        // Directly write a sudoku grid or use a file as shown in the examples
+        grid := "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
+        resolved, err := sudoku.Solve(grid)
+
+        if err != nil {
+            fmt.Print(err)
+        }
+
+        sudoku.Display(resolved)
+    }
+```
+
+Now to run the file just hit `go run main.go` in the command line at the root of your project.
+
+You should see an output looking like this :
+
+```bash
+$ go run main.go
+4 1 7 | 3 6 9 | 8 2 5
+6 3 2 | 1 5 8 | 9 4 7
+9 5 8 | 7 2 4 | 3 1 6
+------+-------+-------
+8 2 5 | 4 3 7 | 1 6 9
+7 9 1 | 5 8 6 | 4 3 2
+3 4 6 | 9 1 2 | 7 5 8
+------+-------+-------
+2 8 9 | 6 4 3 | 5 7 1
+5 7 3 | 2 9 1 | 6 8 4
+1 6 4 | 8 7 5 | 2 9 3
+```
