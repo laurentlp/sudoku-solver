@@ -6,6 +6,13 @@ build:
     # at the right place in the workspace tree
     - setup-go-workspace
 
+    - script:
+        name: Setup branch
+        code: |
+          GIT_BRANCH=$WERCKER_GIT_BRANCH
+          if [ "$GIT_BRANCH" = "HEAD" ]; then GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD); fi
+          echo "Git branch: $GIT_BRANCH"
+
     # Build the project
     - script:
         name: Build
@@ -16,10 +23,28 @@ build:
         name: Get dependencies
         code: |
           go get -u github.com/mattn/goveralls
+          go get -u github.com/golang/lint/golint
+
+    # golint
+    - wercker/golint
+
+    - script:
+        name: go tool vet
+        code: |
+          go tool vet .
+
+    - script:
+        name: gofmt
+        code: |
+          if [[ -n $(gofmt -l .) ]]; then echo "Please run gofmt"; exit 1; fi
 
     # Test the project
     - script:
         name: Test
         code: |
           go test -v -cover -coverprofile=coverage.out ./sudoku
-          goveralls -service='wercker.com' -repotoken=$COVERALLS_TOKEN -coverprofile=coverage.out
+
+    - script:
+        name: Coveralls.io
+        code: |
+          GIT_BRANCH=$GIT_BRANCH goveralls -service='wercker.com' -repotoken=$COVERALLS_TOKEN -coverprofile=coverage.out
