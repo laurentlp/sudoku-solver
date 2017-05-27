@@ -10,7 +10,7 @@ build:
         name: Setup branch
         code: |
           GIT_BRANCH=$WERCKER_GIT_BRANCH
-          if [ "$GIT_BRANCH" = "HEAD" ]; then GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD) fi
+          if [ "$GIT_BRANCH" = "HEAD" ]; then GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD); fi
           echo "Git branch: $GIT_BRANCH"
 
     # Build the project
