@@ -8,12 +8,22 @@ build:
 
     # Build the project
     - script:
-        name: go build
+        name: Build
         code: |
           go build ./...
 
+    - script:
+        name: Get dependencies
+        code: |
+          go get -u github.com/mattn/goveralls
+
     # Test the project
     - script:
-        name: go test
+        name: Test
         code: |
-          go test -v -race ./...
+          go test -v -cover -coverprofile=$WERCKER_REPORT_ARTIFACTS_DIR/coverage.out ./...
+
+    - script:
+        name: Coveralls
+        code: |
+          goveralls -service='wercker.com' -repotoken=$COVERALLS_TOKEN -coverprofile=$WERCKER_REPORT_ARTIFACTS_DIR/coverage.out

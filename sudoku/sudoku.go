@@ -2,6 +2,7 @@ package sudoku
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -82,19 +83,17 @@ func CreateUnits(squares []string, unitList [][]string) map[string][][]string {
 }
 
 // CreatePeers find the 20 peers of a square
-func CreatePeers(units map[string][][]string) map[string][]string {
-	peers := make(map[string][]string, len(units))
+func CreatePeers(units map[string][][]string) map[string]map[string]bool {
+	peers := make(map[string]map[string]bool, len(units))
 
 	for s, ul := range units {
-		peer := make([]string, 20)
-		i := 0
+		peer := make(map[string]bool, 20)
 		for _, u := range ul {
 			for _, su := range u {
 				if s != su {
-					peer[i] = su
+					peer[su] = true
 				}
 			}
-			i++
 		}
 		peers[s] = peer
 	}
@@ -167,7 +166,7 @@ func Eliminate(values map[string]string, s string, v string) (map[string]string,
 	} else if len(values[s]) == 1 {
 		v2 := values[s]
 
-		for _, s2 := range peers[s] {
+		for s2 := range peers[s] {
 			if v, err := Eliminate(values, s2, v2); err != nil && v == nil {
 				return nil, nil
 			}
@@ -176,10 +175,6 @@ func Eliminate(values map[string]string, s string, v string) (map[string]string,
 
 	// If a unit (u) has only one possible place for a value (v), then put it there.
 	for _, u := range units[s] {
-		if len(u) == 0 {
-			return nil, errors.New("Error unit length is zero")
-		}
-
 		dplaces := []string{}
 		for _, s := range u {
 			if strings.Contains(values[s], v) {
@@ -202,10 +197,91 @@ func Eliminate(values map[string]string, s string, v string) (map[string]string,
 // Assign eliminate all the other values (except v) from a square possible values and propagate.
 func Assign(values map[string]string, s string, v string) map[string]string {
 	otherValues := strings.Replace(values[s], v, "", -1)
-	for i := 0; i < len(otherValues); i++ {
-		if v, err := Eliminate(values, s, string(otherValues[i])); err != nil && v == nil {
+	for _, v := range otherValues {
+		if v, err := Eliminate(values, s, string(v)); err != nil && v == nil {
 			return nil
 		}
 	}
 	return values
+}
+
+// Search using depth-first search and propagation, try all possible values.
+func Search(values map[string]string) (map[string]string, error) {
+	if values == nil {
+		return nil, nil
+	}
+
+	// Check if there is only one remaining possibility in every square
+	// If true, return the solved sudoku
+	solved := true
+	for s := range values {
+		if len(values[s]) != 1 {
+			solved = false
+		}
+	}
+
+	if solved {
+		return values, nil
+	}
+
+	// Chose the first unfilled square with the fewest possibilities
+	min := len(digits) + 1
+	sq := ""
+	for _, s := range squares {
+		l := len(values[s])
+		if l > 1 {
+			if l < min {
+				sq = s
+				min = l
+			}
+		}
+	}
+
+	ch := make(chan map[string]string)
+	for _, v := range values[sq] {
+		go func(val string) {
+			newValues := cloneValues(values)
+			value, _ := Search(Assign(newValues, sq, val))
+			if value != nil {
+				ch <- value
+			}
+		}(string(v))
+	}
+
+	return <-ch, nil
+}
+
+// CloneValues from one map to another
+func cloneValues(m map[string]string) map[string]string {
+	newMap := make(map[string]string, len(m))
+	for k, v := range m {
+		newMap[k] = v
+	}
+	return newMap
+}
+
+// Solve the sudoku in input
+func Solve(grid string) (map[string]string, error) {
+	pg, err := ParseGrid(grid)
+	if err != nil {
+		return nil, err
+	}
+
+	return Search(pg)
+}
+
+// Display the solved sudoku
+func Display(values map[string]string) {
+	for i, row := range rows {
+		for j, col := range digits {
+			if j == 3 || j == 6 {
+				fmt.Printf("| ")
+			}
+			fmt.Printf("%v ", values[string(row)+string(col)])
+		}
+		fmt.Println()
+		if i == 2 || i == 5 {
+			fmt.Println("------+-------+-------")
+		}
+	}
 }

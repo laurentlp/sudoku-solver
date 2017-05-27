@@ -11,12 +11,14 @@ const digits string = "123456789"
 const rows string = "ABCDEFGHI"
 const cols string = digits
 const grid = "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
+const gridEasy = "003020600900305001001806400008102900700000008006708200002609500800203009005010300"
+const gridHard = ".....6....59.....82....8....45........3........6..3.54...325..6.................."
 const errorGrid = "4.....8.5.3..........7......2.....6.....8.4......1...."
 
 var squares []string
 var unitList [][]string
 var squareUnits map[string][][]string
-var squarePeers map[string][]string
+var squarePeers map[string]map[string]bool
 
 func TestCross(t *testing.T) {
 	squares = sudoku.Cross(rows, cols)
@@ -112,7 +114,7 @@ func TestGridErr(t *testing.T) {
 }
 
 func TestParseGrid(t *testing.T) {
-	values, err := sudoku.ParseGrid(grid)
+	values, err := sudoku.ParseGrid(gridEasy)
 
 	if err != nil {
 		t.Error(err)
@@ -121,6 +123,8 @@ func TestParseGrid(t *testing.T) {
 	if len(values) != len(grid) {
 		t.Error("Expected a total of ", fmt.Sprintf("%d", len(grid)), " values, but got ", len(values), " values")
 	}
+
+	sudoku.Display(values)
 }
 
 func TestParseGridErr(t *testing.T) {
@@ -128,6 +132,34 @@ func TestParseGridErr(t *testing.T) {
 
 	if err.Error() != ("Invalid grid size: expected grid size of 81 found grid size of " + fmt.Sprintf("%d", len(errorGrid))) {
 		t.Error("An error was supposed to be returned")
+	}
+}
+
+func TestSolve(t *testing.T) {
+	resolved, err := sudoku.Solve(grid)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	sudoku.Display(resolved)
+}
+
+func TestSolveHard(t *testing.T) {
+	resolved, err := sudoku.Solve(gridHard)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	sudoku.Display(resolved)
+}
+
+func TestSolveErr(t *testing.T) {
+	_, err := sudoku.Solve(errorGrid)
+
+	if err == nil {
+		t.Error(err)
 	}
 }
 
@@ -156,7 +188,8 @@ func compareSlices3D(A, B [][]string) bool {
 
 // compareSlices compare values of two 2D arrays.
 // Return true if they are the same
-func compareSlices2D(A, B []string) bool {
+// In this case the boolean value of A is ignored
+func compareSlices2D(A map[string]bool, B []string) bool {
 	if len(A) != len(B) {
 		return false
 	}
@@ -166,10 +199,12 @@ func compareSlices2D(A, B []string) bool {
 	}
 
 	B = B[:len(A)] // Bounds-checking elimination
-	for i, a := range A {
-		if a != B[i] {
+	i := 0
+	for v, _ := range A {
+		if v != B[i] {
 			return false
 		}
+		i++
 	}
 
 	return true
