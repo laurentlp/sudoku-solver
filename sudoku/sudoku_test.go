@@ -2,165 +2,75 @@ package sudoku_test
 
 import (
 	"fmt"
+	"io/ioutil"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/laurentlp/sudoku-solver/sudoku"
 )
 
-const digits string = "123456789"
-const rows string = "ABCDEFGHI"
-const cols string = digits
 const grid = "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
-const gridEasy = "003020600900305001001806400008102900700000008006708200002609500800203009005010300"
-const gridHard = ".....6....59.....82....8....45........3........6..3.54...325..6.................."
+
+//                     |
+//                     v
+const invalidGrid = "..757..3.1......2.7...234......8...4..7..4...49....6.5.42...3.....7..9....18....."
 const errorGrid = "4.....8.5.3..........7......2.....6.....8.4......1...."
-
-var squares []string
-var unitList [][]string
-var squareUnits map[string][][]string
-var squarePeers map[string]map[string]bool
-
-func TestCross(t *testing.T) {
-	squares = sudoku.Cross(rows, cols)
-
-	if len(squares) != 81 {
-		t.Error("Expected 81 squares")
-	}
-}
-
-func TestUnitList(t *testing.T) {
-	unitList = sudoku.CreateUnitList(rows, cols)
-
-	var tot int
-	for _, u := range unitList {
-		tot += len(u)
-	}
-
-	if tot != 81*3 {
-		t.Error("Expected 243 squares got : ", tot)
-	}
-}
-
-func TestCreateUnits(t *testing.T) {
-	squareUnits = sudoku.CreateUnits(squares, unitList)
-	for _, u := range squareUnits {
-		if len(u) != 3 {
-			t.Error("Unit length expected 3 got : ", len(u))
-		}
-	}
-}
-
-func TestUnit(t *testing.T) {
-	unit := [][]string{
-		[]string{"A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2", "I2"},
-		[]string{"C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"},
-		[]string{"A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3"},
-	}
-
-	c2 := squareUnits["C2"]
-	if !compareSlices3D(c2, unit) {
-		t.Error("An error occurred while creating units. Some returned values are wrong !")
-	}
-}
-
-func TestCreatePeers(t *testing.T) {
-	squarePeers = sudoku.CreatePeers(squareUnits)
-	for k, p := range squarePeers {
-		if len(p) != 20 {
-			t.Error("Peers length expected 20 got : ", len(squarePeers[k]), " for the square ", k)
-		}
-	}
-}
-
-func TestPeers(t *testing.T) {
-	unit := []string{
-		"A2", "B2", "D2", "E2", "F2", "G2", "H2", "I2",
-		"C1", "C3", "C4", "C5", "C6", "C7", "C8", "C9",
-		"A1", "A3", "B1", "B3",
-	}
-
-	c2 := squarePeers["C2"]
-	if compareSlices2D(c2, unit) {
-		t.Error("An error occurred while creating peers. Some returned values are wrong !")
-	}
-}
-
-func TestGrid(t *testing.T) {
-	result := map[string]string{}
-
-	for i, s := range squares {
-		result[s] = string(grid[i])
-	}
-
-	values, err := sudoku.GridValues(grid)
-
-	if len(values) != len(grid) {
-		t.Error(err)
-	}
-
-	for k, v := range values {
-		if v != result[k] {
-			t.Error("Value is invalid. Expected a value of " + result[k] + " got one of " + v)
-		}
-	}
-}
-
-func TestGridErr(t *testing.T) {
-	_, err := sudoku.GridValues(errorGrid)
-
-	if err.Error() != ("Invalid grid size: expected grid size of 81 found grid size of " + fmt.Sprintf("%d", len(errorGrid))) {
-		t.Error("An error was supposed to be returned")
-	}
-}
-
-func TestParseGrid(t *testing.T) {
-	values, err := sudoku.ParseGrid(gridEasy)
-
-	if err != nil {
-		t.Error(err)
-	}
-
-	if len(values) != len(grid) {
-		t.Error("Expected a total of ", fmt.Sprintf("%d", len(grid)), " values, but got ", len(values), " values")
-	}
-
-	sudoku.Display(values)
-}
-
-func TestParseGridErr(t *testing.T) {
-	_, err := sudoku.ParseGrid(errorGrid)
-
-	if err.Error() != ("Invalid grid size: expected grid size of 81 found grid size of " + fmt.Sprintf("%d", len(errorGrid))) {
-		t.Error("An error was supposed to be returned")
-	}
-}
+const emptyGrid = ""
+const wrongGrid = "..757..3.1....a.2.7...234......8x..4..7..4...49....6.5.42...3e....7..9....18....."
 
 func TestSolve(t *testing.T) {
-	resolved, err := sudoku.Solve(grid)
+	solved, err := sudoku.Solve(grid)
 
 	if err != nil {
-		t.Error(err)
+		t.Error("Error : ", err)
 	}
 
-	sudoku.Display(resolved)
-}
-
-func TestSolveHard(t *testing.T) {
-	resolved, err := sudoku.Solve(gridHard)
-
-	if err != nil {
-		t.Error(err)
-	}
-
-	sudoku.Display(resolved)
+	sudoku.Display(solved)
 }
 
 func TestSolveErr(t *testing.T) {
 	_, err := sudoku.Solve(errorGrid)
 
-	if err == nil {
-		t.Error(err)
+	if err.Error() != "Invalid grid size: expected grid size of 81 found grid size of 54" {
+		t.Error("Error : ", err)
 	}
+}
+
+func TestSolveEmpty(t *testing.T) {
+	_, err := sudoku.Solve(emptyGrid)
+
+	if err.Error() != "Invalid grid size: expected grid size of 81 found grid size of 0" {
+		t.Error("Error : ", err)
+	}
+}
+
+func TestSolveInvalid(t *testing.T) {
+	_, err := sudoku.Solve(invalidGrid)
+
+	if err.Error() != "The sudoku contains errors and can not be solved" {
+		t.Error("Error : ", err)
+	}
+}
+
+func TestSolveWrong(t *testing.T) {
+	_, err := sudoku.Solve(wrongGrid)
+
+	if err.Error() != "The sudoku contains errors and can not be solved" {
+		t.Error("Error : ", err)
+	}
+}
+
+func TestSolveHardest(t *testing.T) {
+	solveAll(fromFile("./_tests/hardest.txt"), "hardest", t)
+}
+
+func TestSolveTopSudoku(t *testing.T) {
+	solveAll(fromFile("./_tests/top95.txt"), "hard", t)
+}
+
+func TestSolveEasy(t *testing.T) {
+	solveAll(fromFile("./_tests/easy50.txt"), "easy", t)
 }
 
 // compareSlices compare values of two 3D arrays.
@@ -208,4 +118,78 @@ func compareSlices2D(A map[string]bool, B []string) bool {
 	}
 
 	return true
+}
+
+// timeSolve calculate the time it takes to solve a sudoku
+func timeSolve(grid string) (int64, bool) {
+	nanosStart := time.Now().UnixNano()
+
+	// Solve the sudoku in input
+	_, err := sudoku.Solve(grid)
+
+	duration := time.Now().UnixNano() - nanosStart
+
+	return duration, err == nil
+}
+
+// fromFile load a sudoku from a file
+func fromFile(filename string) []string {
+	dat, _ := ioutil.ReadFile(filename)
+	grids := strings.Split(string(dat), "\n")
+	return grids[:len(grids)-1]
+}
+
+// nanoconv convert unix time to a unit in second
+func nanoconv(nanos int64) float64 {
+	return float64(nanos) / 1000000000.0
+}
+
+// solveAll the sudoku inside a file
+func solveAll(grids []string, name string, t *testing.T) {
+	times := make([]int64, len(grids))
+	results := make([]bool, len(grids))
+
+	for i, grid := range grids {
+		t, result := timeSolve(grid)
+		times[i] = t
+		results[i] = result
+	}
+
+	n := len(grids)
+	sudokuNumber := len(results)
+	if n > 1 {
+		// E.g. Solved 49 of 49 easy puzzles (avg 0.0033 secs (304.60 Hz), max 0.0112 secs).
+		fmt.Printf("Solved %d of %d %s puzzles (avg %.4f secs (%.2f Hz), max %.4f secs).\n",
+			sudokuNumber, // Number of sudoku solved
+			n,            // Total number of sudoku to solve
+			name,         // The type of the sudoku solved
+			nanoconv(sum(times))/float64(n), // Average time to solve this type of sudoku
+			float64(n)/nanoconv(sum(times)), // Average hertz used to solve this type of sudoku
+			nanoconv(max(times)))            // The maximum time it took to solve one of the sudoku
+	}
+
+	if sudokuNumber != n {
+		t.Error("Not all the sudoku have been solved")
+	}
+}
+
+// max returns the maximum value of an array
+func max(values []int64) (max int64) {
+	max = 0
+
+	for _, v := range values {
+		if v > max {
+			max = v
+		}
+	}
+	return max
+}
+
+// sum returns the sum of all the number inside an array
+func sum(items []int64) (tot int64) {
+	tot = 0
+	for _, i := range items {
+		tot += i
+	}
+	return tot
 }

@@ -1,4 +1,4 @@
-package examples
+package main
 
 import (
 	"bufio"
@@ -10,9 +10,9 @@ import (
 
 func main() {
 	// File containing sudoku(s)
-	file, err := os.Open("../sudoku/_test/sudoku.txt")
+	file, err := os.Open("./sudoku/_tests/hardest.txt")
 	if err != nil {
-		panic("Couldn't open file sudoku.txt : " + err.Error())
+		panic("Couldn't open file hardest.txt : " + err.Error())
 	}
 
 	defer file.Close()
