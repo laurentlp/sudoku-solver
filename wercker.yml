@@ -1,0 +1,25 @@
+box: golang
+
+build:
+  steps:
+    # Sets the go workspace and places you package
+    # at the right place in the workspace tree
+    - setup-go-workspace
+
+    # Build the project
+    - script:
+        name: Build
+        code: |
+          go build ./...
+
+    - script:
+        name: Get dependencies
+        code: |
+          go get -u github.com/mattn/goveralls
+
+    # Test the project
+    - script:
+        name: Test
+        code: |
+          go test -v -cover -coverprofile=coverage.out ./sudoku
+          goveralls -service='wercker.com' -repotoken=$COVERALLS_TOKEN -coverprofile=coverage.out
