@@ -24,6 +24,7 @@ build:
         code: |
           go get -u github.com/mattn/goveralls
           go get -u github.com/golang/lint/golint
+          go get github.com/gorilla/mux
 
     # golint
     - wercker/golint
@@ -42,7 +43,7 @@ build:
     - script:
         name: Test
         code: |
-          go test -v -cover -coverprofile=coverage.out ./sudoku
+          go test -v -cover -coverprofile=coverage.out ./solver
 
     - script:
         name: Coveralls.io
