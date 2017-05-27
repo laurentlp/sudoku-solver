@@ -19,9 +19,9 @@ $ cd $GOPATH/src/github.com/laurentlp/sudoku-solver
 $ go test -v ./...
 ```
 
-## Basic using
+## Basic usage
 
-First create a go project in which you need a `main.go` file
+First create a go project in which you will need a `main.go` file
 
 ```golang
     package main
@@ -33,7 +33,7 @@ First create a go project in which you need a `main.go` file
     )
 
     func main() {
-        // Directly write a sudoku grid or use a file as shown in the examples
+        // Directly write a sudoku grid or use a file as shown in the examples folder
         grid := "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
         resolved, err := sudoku.Solve(grid)
 
