@@ -21,9 +21,5 @@ build:
     - script:
         name: Test
         code: |
-          go test -v -cover -coverprofile=$WERCKER_REPORT_ARTIFACTS_DIR/coverage.out ./...
-
-    - script:
-        name: Coveralls
-        code: |
-          goveralls -service='wercker.com' -repotoken=$COVERALLS_TOKEN -coverprofile=$WERCKER_REPORT_ARTIFACTS_DIR/coverage.out
+          go test -v -cover -coverprofile=coverage.out ./...
+          goveralls -service='wercker.com' -repotoken=$COVERALLS_TOKEN -coverprofile=coverage.out
