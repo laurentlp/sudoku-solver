@@ -11,13 +11,13 @@ const digits string = "123456789"
 const rows string = "ABCDEFGHI"
 const cols string = digits
 
-var squares = Cross(rows, cols)
-var unitlist = CreateUnitList(rows, cols)
-var units = CreateUnits(squares, unitlist)
-var peers = CreatePeers(units)
+var squares = cross(rows, cols)
+var unitlist = createUnitList(rows, cols)
+var units = createUnits(squares, unitlist)
+var peers = createPeers(units)
 
 // Cross the product of each elements in strings A and B together
-func Cross(A, B string) []string {
+func cross(A, B string) []string {
 	res := make([]string, len(A)*len(B))
 
 	i := 0
@@ -32,18 +32,18 @@ func Cross(A, B string) []string {
 }
 
 // CreateUnitList list the 20 peers of each sudoku squares
-func CreateUnitList(rows, cols string) [][]string {
+func createUnitList(rows, cols string) [][]string {
 	res := make([][]string, len(rows)*3)
 
 	i := 0
 	for _, c := range cols {
 		// A1 B1 C1 D1 E1 F1 G1 H1 I1...
-		res[i] = Cross(rows, string(c))
+		res[i] = cross(rows, string(c))
 		i++
 	}
 
 	for _, r := range rows {
-		res[i] = Cross(string(r), cols)
+		res[i] = cross(string(r), cols)
 		i++
 	}
 
@@ -51,7 +51,7 @@ func CreateUnitList(rows, cols string) [][]string {
 	cs := []string{`123`, `456`, `789`}
 	for _, r := range rs {
 		for _, c := range cs {
-			res[i] = Cross((r), string(c))
+			res[i] = cross((r), string(c))
 			i++
 		}
 	}
@@ -60,7 +60,7 @@ func CreateUnitList(rows, cols string) [][]string {
 }
 
 // CreateUnits find the units of each squares
-func CreateUnits(squares []string, unitList [][]string) map[string][][]string {
+func createUnits(squares []string, unitList [][]string) map[string][][]string {
 	units := make(map[string][][]string, len(squares))
 
 	for _, s := range squares {
@@ -83,7 +83,7 @@ func CreateUnits(squares []string, unitList [][]string) map[string][][]string {
 }
 
 // CreatePeers find the 20 peers of a square
-func CreatePeers(units map[string][][]string) map[string]map[string]bool {
+func createPeers(units map[string][][]string) map[string]map[string]bool {
 	peers := make(map[string]map[string]bool, len(units))
 
 	for s, ul := range units {
@@ -102,7 +102,7 @@ func CreatePeers(units map[string][][]string) map[string]map[string]bool {
 }
 
 // GridValues match all the sudoku values to its square
-func GridValues(grid string) (map[string]string, error) {
+func gridValues(grid string) (map[string]string, error) {
 	values := make(map[string]string, len(grid))
 	chars := make([]string, len(grid))
 
@@ -131,16 +131,16 @@ func GridValues(grid string) (map[string]string, error) {
 
 // ParseGrid convert a grid to a dict of possible values, {square: digits}, or
 // return nil if a contradiction is detected.
-func ParseGrid(grid string) (values map[string]string, err error) {
+func parseGrid(grid string) (values map[string]string, err error) {
 	values = make(map[string]string, len(squares))
 	for _, s := range squares {
 		values[s] = digits
 	}
 
-	gr, err := GridValues(grid)
+	gr, err := gridValues(grid)
 	for s, v := range gr {
 		if strings.Contains(digits, v) {
-			values = Assign(values, s, v)
+			values = assign(values, s, v)
 			if values == nil {
 				return nil, nil
 			}
@@ -151,10 +151,10 @@ func ParseGrid(grid string) (values map[string]string, err error) {
 
 // Eliminate removes d from values[s]; propagate when values or places <= 2.
 // Return values, except return False if a contradiction is detected.
-func Eliminate(values map[string]string, s string, v string) (map[string]string, error) {
+func eliminate(values map[string]string, s string, v string) (map[string]string, bool) {
 	// The value is already eliminated
 	if !strings.Contains(values[s], v) {
-		return values, nil
+		return values, true
 	}
 
 	// Remove all occurrences of the value (v) from the square possible values
@@ -162,13 +162,13 @@ func Eliminate(values map[string]string, s string, v string) (map[string]string,
 
 	// If a square (s) is reduced to one value (v2), then eliminate the value from the peers.
 	if len(values[s]) == 0 {
-		return nil, nil
+		return nil, false
 	} else if len(values[s]) == 1 {
 		v2 := values[s]
 
 		for s2 := range peers[s] {
-			if v, err := Eliminate(values, s2, v2); err != nil && v == nil {
-				return nil, nil
+			if _, ok := eliminate(values, s2, v2); !ok {
+				return nil, false
 			}
 		}
 	}
@@ -183,22 +183,22 @@ func Eliminate(values map[string]string, s string, v string) (map[string]string,
 		}
 
 		if len(dplaces) == 0 {
-			return nil, nil
+			return nil, false
 		} else if len(dplaces) == 1 {
-			if Assign(values, dplaces[0], v) == nil {
-				return nil, nil
+			if assign(values, dplaces[0], v) == nil {
+				return nil, false
 			}
 		}
 	}
 
-	return values, nil
+	return values, true
 }
 
 // Assign eliminate all the other values (except v) from a square possible values and propagate.
-func Assign(values map[string]string, s string, v string) map[string]string {
+func assign(values map[string]string, s string, v string) map[string]string {
 	otherValues := strings.Replace(values[s], v, "", -1)
 	for _, v := range otherValues {
-		if v, err := Eliminate(values, s, string(v)); err != nil && v == nil {
+		if _, ok := eliminate(values, s, string(v)); !ok {
 			return nil
 		}
 	}
@@ -206,9 +206,9 @@ func Assign(values map[string]string, s string, v string) map[string]string {
 }
 
 // Search using depth-first search and propagation, try all possible values.
-func Search(values map[string]string) (map[string]string, error) {
+func search(values map[string]string) (map[string]string, error) {
 	if values == nil {
-		return nil, nil
+		return nil, errors.New("The sudoku contains errors and can not be solved")
 	}
 
 	// Check if there is only one remaining possibility in every square
@@ -229,11 +229,9 @@ func Search(values map[string]string) (map[string]string, error) {
 	sq := ""
 	for _, s := range squares {
 		l := len(values[s])
-		if l > 1 {
-			if l < min {
-				sq = s
-				min = l
-			}
+		if l > 1 && l < min {
+			sq = s
+			min = l
 		}
 	}
 
@@ -241,13 +239,12 @@ func Search(values map[string]string) (map[string]string, error) {
 	for _, v := range values[sq] {
 		go func(val string) {
 			newValues := cloneValues(values)
-			value, _ := Search(Assign(newValues, sq, val))
+			value, _ := search(assign(newValues, sq, val))
 			if value != nil {
 				ch <- value
 			}
 		}(string(v))
 	}
-
 	return <-ch, nil
 }
 
@@ -262,12 +259,12 @@ func cloneValues(m map[string]string) map[string]string {
 
 // Solve the sudoku in input
 func Solve(grid string) (map[string]string, error) {
-	pg, err := ParseGrid(grid)
+	pg, err := parseGrid(grid)
 	if err != nil {
 		return nil, err
 	}
 
-	return Search(pg)
+	return search(pg)
 }
 
 // Display the solved sudoku
