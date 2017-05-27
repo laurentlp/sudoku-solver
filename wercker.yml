@@ -6,6 +6,13 @@ build:
     # at the right place in the workspace tree
     - setup-go-workspace
 
+    - script:
+        name: Setup branch
+        code: |
+          GIT_BRANCH=$WERCKER_GIT_BRANCH
+          if [ "$GIT_BRANCH" = "HEAD" ]; then GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD) fi
+          echo "Git branch: $GIT_BRANCH"
+
     # Build the project
     - script:
         name: Build
@@ -40,4 +47,4 @@ build:
     - script:
         name: Coveralls.io
         code: |
-          goveralls -service='wercker.com' -repotoken=$COVERALLS_TOKEN -coverprofile=coverage.out
+          GIT_BRANCH=$GIT_BRANCH goveralls -service='wercker.com' -repotoken=$COVERALLS_TOKEN -coverprofile=coverage.out
