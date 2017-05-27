@@ -2,6 +2,7 @@
 
 [![wercker status](https://app.wercker.com/status/3ee8307fdb3876b6c0f7a504caf5daef/s/master "wercker status")](https://app.wercker.com/project/byKey/3ee8307fdb3876b6c0f7a504caf5daef)
 [![Coverage Status](https://coveralls.io/repos/github/laurentlp/sudoku-solver/badge.svg)](https://coveralls.io/github/laurentlp/sudoku-solver)
+[![Go Report Card](https://goreportcard.com/badge/github.com/laurentlp/sudoku-solver)](https://goreportcard.com/report/github.com/laurentlp/sudoku-solver)
 
 A simple golang sudoku solver using Peter Norvig algorithm
 
