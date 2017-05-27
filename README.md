@@ -37,7 +37,7 @@ with the body (JSON) :
 
 Result :
 
-![solved.jpg from the examples folder](https://raw.githubusercontent.com/laurentlp/sudoku-solver/master/examples/solved.jpg)
+![solved.jpg from the examples folder](https://raw.githubusercontent.com/laurentlp/sudoku-solver/master/examples/solved.jpeg)
 
 ## Basic usage of the solver
 
