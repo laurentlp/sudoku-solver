@@ -107,12 +107,12 @@ func GridValues(grid string) (map[string]string, error) {
 	values := make(map[string]string, len(grid))
 	chars := make([]string, len(grid))
 
-	// For each square
+	// For each squares
 	for i := 0; i < len(grid); i++ {
 		// Value of the square
 		str := grid[i : i+1]
-		// Valid that the square value is a digit from 1 to 9 or '0' or '.' for empties
-		// and adds it to the sudoku list of values.
+		// Valid that the square value is a digit from 1 to 9 ('0' or '.' for empties)
+		// and add it to the sudoku list of values.
 		if strings.Contains(digits, str) || strings.Contains("0.", str) {
 			chars[i] = str
 		}
@@ -128,4 +128,84 @@ func GridValues(grid string) (map[string]string, error) {
 	}
 
 	return values, nil
+}
+
+// ParseGrid convert a grid to a dict of possible values, {square: digits}, or
+// return nil if a contradiction is detected.
+func ParseGrid(grid string) (values map[string]string, err error) {
+	values = make(map[string]string, len(squares))
+	for _, s := range squares {
+		values[s] = digits
+	}
+
+	gr, err := GridValues(grid)
+	for s, v := range gr {
+		if strings.Contains(digits, v) {
+			values = Assign(values, s, v)
+			if values == nil {
+				return nil, nil
+			}
+		}
+	}
+	return values, err
+}
+
+// Eliminate removes d from values[s]; propagate when values or places <= 2.
+// Return values, except return False if a contradiction is detected.
+func Eliminate(values map[string]string, s string, v string) (map[string]string, error) {
+	// The value is already eliminated
+	if !strings.Contains(values[s], v) {
+		return values, nil
+	}
+
+	// Remove all occurrences of the value (v) from the square possible values
+	values[s] = strings.Replace(values[s], v, "", -1)
+
+	// If a square (s) is reduced to one value (v2), then eliminate the value from the peers.
+	if len(values[s]) == 0 {
+		return nil, nil
+	} else if len(values[s]) == 1 {
+		v2 := values[s]
+
+		for _, s2 := range peers[s] {
+			if v, err := Eliminate(values, s2, v2); err != nil && v == nil {
+				return nil, nil
+			}
+		}
+	}
+
+	// If a unit (u) has only one possible place for a value (v), then put it there.
+	for _, u := range units[s] {
+		if len(u) == 0 {
+			return nil, errors.New("Error unit length is zero")
+		}
+
+		dplaces := []string{}
+		for _, s := range u {
+			if strings.Contains(values[s], v) {
+				dplaces = append(dplaces, s)
+			}
+		}
+
+		if len(dplaces) == 0 {
+			return nil, nil
+		} else if len(dplaces) == 1 {
+			if Assign(values, dplaces[0], v) == nil {
+				return nil, nil
+			}
+		}
+	}
+
+	return values, nil
+}
+
+// Assign eliminate all the other values (except v) from a square possible values and propagate.
+func Assign(values map[string]string, s string, v string) map[string]string {
+	otherValues := strings.Replace(values[s], v, "", -1)
+	for i := 0; i < len(otherValues); i++ {
+		if v, err := Eliminate(values, s, string(otherValues[i])); err != nil && v == nil {
+			return nil
+		}
+	}
+	return values
 }

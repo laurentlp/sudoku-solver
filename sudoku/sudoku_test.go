@@ -10,6 +10,8 @@ import (
 const digits string = "123456789"
 const rows string = "ABCDEFGHI"
 const cols string = digits
+const grid = "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
+const errorGrid = "4.....8.5.3..........7......2.....6.....8.4......1...."
 
 var squares []string
 var unitList [][]string
@@ -82,7 +84,6 @@ func TestPeers(t *testing.T) {
 }
 
 func TestGrid(t *testing.T) {
-	grid := "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......" // 81 values
 	result := map[string]string{}
 
 	for i, s := range squares {
@@ -103,11 +104,29 @@ func TestGrid(t *testing.T) {
 }
 
 func TestGridErr(t *testing.T) {
-	grid := "4.....8.5.3..........7......2.....6.....8.4......1...." // 54 values
+	_, err := sudoku.GridValues(errorGrid)
 
-	_, err := sudoku.GridValues(grid)
+	if err.Error() != ("Invalid grid size: expected grid size of 81 found grid size of " + fmt.Sprintf("%d", len(errorGrid))) {
+		t.Error("An error was supposed to be returned")
+	}
+}
 
-	if err.Error() != ("Invalid grid size: expected grid size of 81 found grid size of " + fmt.Sprintf("%d", len(grid))) {
+func TestParseGrid(t *testing.T) {
+	values, err := sudoku.ParseGrid(grid)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(values) != len(grid) {
+		t.Error("Expected a total of ", fmt.Sprintf("%d", len(grid)), " values, but got ", len(values), " values")
+	}
+}
+
+func TestParseGridErr(t *testing.T) {
+	_, err := sudoku.ParseGrid(errorGrid)
+
+	if err.Error() != ("Invalid grid size: expected grid size of 81 found grid size of " + fmt.Sprintf("%d", len(errorGrid))) {
 		t.Error("An error was supposed to be returned")
 	}
 }
