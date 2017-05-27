@@ -14,14 +14,34 @@ $ go get github.com/laurentlp/sudoku-solver
 
 ## Running the tests
 
+### Test the solver
+
 ```shell
 $ cd $GOPATH/src/github.com/laurentlp/sudoku-solver
-$ go test -v ./...
+$ go test -v ./solver
 ```
 
-## Basic usage
+## API
 
-First create a go project in which you will need a `main.go` file
+To use the api, simply run the `main.go` file in the command line.
+Then enter your sudoku in the body of the request as shown bellow :
+
+Make a POST request to `http://localhost:8080/sudoku`
+
+with the body (JSON) :
+    ```json
+    {
+        "sudoku" : "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
+    }
+    ```
+
+Result :
+
+![solved.jpg from the examples folder](https://raw.githubusercontent.com/laurentlp/sudoku-solver/master/examples/solved.jpg)
+
+## Basic usage of the solver
+
+First create a separate go project in which you will need a `main.go` file
 
 ```golang
     package main

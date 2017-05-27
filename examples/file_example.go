@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/laurentlp/sudoku-solver/sudoku"
+	"github.com/laurentlp/sudoku-solver/solver"
 )
 
 func main() {
@@ -25,11 +25,11 @@ func main() {
 		}
 
 		fmt.Println("problem(hard): ", string(line))
-		resolved, err := sudoku.Solve(string(line))
+		resolved, err := solver.Solve(string(line))
 		if err != nil {
 			break
 		}
 
-		sudoku.Display(resolved)
+		solver.Display(resolved)
 	}
 }

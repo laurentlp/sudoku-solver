@@ -1,4 +1,4 @@
-package sudoku_test
+package solver_test
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/laurentlp/sudoku-solver/sudoku"
+	"github.com/laurentlp/sudoku-solver/solver"
 )
 
 const grid = "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
@@ -20,17 +20,17 @@ const emptyGrid = ""
 const wrongGrid = "..757..3.1....a.2.7...234......8x..4..7..4...49....6.5.42...3e....7..9....18....."
 
 func TestSolve(t *testing.T) {
-	solved, err := sudoku.Solve(grid)
+	sudoku, err := solver.Solve(grid)
 
 	if err != nil {
 		t.Error("Error : ", err)
 	}
 
-	sudoku.Display(solved)
+	solver.Display(sudoku)
 }
 
 func TestSolveErr(t *testing.T) {
-	_, err := sudoku.Solve(errorGrid)
+	_, err := solver.Solve(errorGrid)
 
 	if err.Error() != "Invalid grid size: expected grid size of 81 found grid size of 54" {
 		t.Error("Error : ", err)
@@ -38,7 +38,7 @@ func TestSolveErr(t *testing.T) {
 }
 
 func TestSolveEmpty(t *testing.T) {
-	_, err := sudoku.Solve(emptyGrid)
+	_, err := solver.Solve(emptyGrid)
 
 	if err.Error() != "Invalid grid size: expected grid size of 81 found grid size of 0" {
 		t.Error("Error : ", err)
@@ -46,7 +46,7 @@ func TestSolveEmpty(t *testing.T) {
 }
 
 func TestSolveInvalid(t *testing.T) {
-	_, err := sudoku.Solve(invalidGrid)
+	_, err := solver.Solve(invalidGrid)
 
 	if err.Error() != "The sudoku contains errors and can not be solved" {
 		t.Error("Error : ", err)
@@ -54,7 +54,7 @@ func TestSolveInvalid(t *testing.T) {
 }
 
 func TestSolveWrong(t *testing.T) {
-	_, err := sudoku.Solve(wrongGrid)
+	_, err := solver.Solve(wrongGrid)
 
 	if err.Error() != "The sudoku contains errors and can not be solved" {
 		t.Error("Error : ", err)
@@ -125,7 +125,7 @@ func timeSolve(grid string) (int64, bool) {
 	nanosStart := time.Now().UnixNano()
 
 	// Solve the sudoku in input
-	_, err := sudoku.Solve(grid)
+	_, err := solver.Solve(grid)
 
 	duration := time.Now().UnixNano() - nanosStart
 
