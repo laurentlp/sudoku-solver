@@ -59,7 +59,7 @@ func TestUnit(t *testing.T) {
 
 	c2 := squareUnits["C2"]
 	if !compareSlices3D(c2, unit) {
-		t.Error("An error occured while creating units. Some returned values are wrong !")
+		t.Error("An error occurred while creating units. Some returned values are wrong !")
 	}
 }
 
@@ -81,7 +81,7 @@ func TestPeers(t *testing.T) {
 
 	c2 := squarePeers["C2"]
 	if compareSlices2D(c2, unit) {
-		t.Error("An error occured while creating peers. Some returned values are wrong !")
+		t.Error("An error occurred while creating peers. Some returned values are wrong !")
 	}
 }
 
