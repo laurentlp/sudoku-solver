@@ -2,6 +2,7 @@ package sudokubundle
 
 import (
 	"net/http"
+	"sort"
 
 	"github.com/laurentlp/sudoku-solver/api/common"
 	"github.com/laurentlp/sudoku-solver/api/errors"
@@ -43,9 +44,15 @@ func (s *SudokuController) Solve(w http.ResponseWriter, r *http.Request) {
 
 // ToString convert the solved sudoku (map[string]string) to as string of values
 func toString(solvedSudoku map[string]string) (res string) {
-
-	for _, v := range solvedSudoku {
-		res += v
+	keys := []string{}
+	for k := range solvedSudoku {
+		keys = append(keys, k)
 	}
+
+	sort.Strings(keys)
+	for _, k := range keys {
+		res += solvedSudoku[k]
+	}
+
 	return res
 }
