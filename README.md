@@ -21,6 +21,21 @@ $ cd $GOPATH/src/github.com/laurentlp/sudoku-solver
 $ go test -v ./solver
 ```
 
+### Test everything
+
+Simply run the `test.sh` file like so
+
+```shell
+$ cd $GOPATH/src/github.com/laurentlp/sudoku-solver
+$ ./test.sh
+```
+
+*Before, make sure the file is executable
+
+```bash
+$ chmod 777 test.sh
+```
+
 ## API
 
 To use the api, simply run the `main.go` file in the command line.
@@ -31,9 +46,9 @@ Make a POST request to `http://localhost:8080/sudoku`
 with the body (JSON) :
 
 ```json
-    {
-        "sudoku" : "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
-    }
+{
+    "sudoku" : "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
+}
 ```
 
 Result :
@@ -45,25 +60,25 @@ Result :
 First create a separate go project in which you will need a `main.go` file
 
 ```golang
-    package main
+package main
 
-    import (
-        "fmt"
+import (
+    "fmt"
 
-        "github.com/laurentlp/sudoku-solver/solver"
-    )
+    "github.com/laurentlp/sudoku-solver/solver"
+)
 
-    func main() {
-        // Directly write a sudoku grid or use a file as shown in the examples folder
-        grid := "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
-        resolved, err := solver.Solve(grid)
+func main() {
+    // Directly write a sudoku grid or use a file as shown in the examples folder
+    grid := "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
+    resolved, err := solver.Solve(grid)
 
-        if err != nil {
-            fmt.Print(err)
-        }
-
-        solver.Display(resolved)
+    if err != nil {
+        fmt.Print(err)
     }
+
+    solver.Display(resolved)
+}
 ```
 
 Now to run the file just hit `go run main.go` in the command line at the root of your project.

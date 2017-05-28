@@ -3,7 +3,6 @@ package solver
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -106,19 +105,35 @@ func gridValues(grid string) (map[string]string, error) {
 	values := make(map[string]string, len(grid))
 	chars := make([]string, len(grid))
 
-	// For each squares
+	// The number of clues given in the grid
+	nbClues := 0
+	var diffDigits []string
+
+	// For each square
 	for i := 0; i < len(grid); i++ {
 		// Value of the square
 		str := grid[i : i+1]
+
 		// Valid that the square value is a digit from 1 to 9 ('0' or '.' for empties)
 		// and add it to the sudoku list of values.
 		if strings.Contains(digits, str) || strings.Contains("0.", str) {
 			chars[i] = str
 		}
+		if strings.Contains(digits, str) {
+			nbClues++
+			if !contains(diffDigits, str) {
+				diffDigits = append(diffDigits, str)
+			}
+		}
 	}
 
 	if len(chars) != 81 {
-		return nil, errors.New("Invalid grid size: expected grid size of 81 found grid size of " + strconv.Itoa(len(chars)))
+
+		return nil, fmt.Errorf("Invalid grid size: expected grid size of 81 found grid size of %d", len(chars))
+	} else if nbClues < 17 {
+		return nil, fmt.Errorf("Invalid number of squares filled: expected a minimum of 17 clues found %d", nbClues)
+	} else if len(diffDigits) < 8 {
+		return nil, fmt.Errorf("Invalid number of diffrent clues digits: expected a minimum of 8 different digits found %d", len(diffDigits))
 	}
 
 	// Map the square value to it's corresponding key (A1, B5, D8,...)
@@ -281,4 +296,13 @@ func Display(values map[string]string) {
 			fmt.Println("------+-------+-------")
 		}
 	}
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }

@@ -33,7 +33,7 @@ func (c *Controller) SendJSON(w http.ResponseWriter, r *http.Request, v interfac
 }
 
 // MapJSON marshals v to a json struct
-// Return nil if succesful, an error otherwise
+// Return nil if successful, an error otherwise
 func (c *Controller) MapJSON(w http.ResponseWriter, r *http.Request, v interface{}) *errors.APIError {
 	// Maximum size of the response body is 100 bytes
 	r.Body = http.MaxBytesReader(w, r.Body, 100<<(1))
