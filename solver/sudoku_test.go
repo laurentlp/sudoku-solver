@@ -19,10 +19,12 @@ const invalidGrid = "..757..3.1......2.7...234......8...4..7..4...49....6.5.42..
 const errorGrid = "4.....8.5.3..........7......2.....6.....8.4......1...."
 const emptyGrid = ""
 const wrongGrid = "..757..3.1....a.2.7...234......8x..4..7..4...49....6.5.42...3e....7..9....18....."
+const shortCluesGrid = "4.....8.5............7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
+const invalidNbDiffDigitsGrid = "4.....8.5.3..........7......2.....6.....8.4.........6....6.3.7.5..2......64......"
 
 func TestSudokuSolving(t *testing.T) {
 	Convey("Given sudokus grid and a solver", t, func() {
-		Convey("When Solve is called from the solver with the grid\n", func() {
+		Convey("When Solve is called from the solver with a grid\n", func() {
 			sudoku, err := solver.Solve(grid)
 			solver.Display(sudoku)
 
@@ -31,7 +33,7 @@ func TestSudokuSolving(t *testing.T) {
 			})
 		})
 
-		Convey("When Solve is called from the solver with the short grid", func() {
+		Convey("When Solve is called from the solver with a short grid", func() {
 			_, err := solver.Solve(errorGrid)
 
 			Convey("Then return an error", func() {
@@ -39,7 +41,7 @@ func TestSudokuSolving(t *testing.T) {
 			})
 		})
 
-		Convey("When Solve is called from the solver with the empty grid", func() {
+		Convey("When Solve is called from the solver with an empty grid", func() {
 			_, err := solver.Solve(emptyGrid)
 
 			Convey("Then return an error", func() {
@@ -60,6 +62,22 @@ func TestSudokuSolving(t *testing.T) {
 
 			Convey("Then return an error", func() {
 				So(err.Error(), ShouldEqual, "The sudoku contains errors and can not be solved")
+			})
+		})
+
+		Convey("When Solve is called from the solver with a grid containing not enough clues", func() {
+			_, err := solver.Solve(shortCluesGrid)
+
+			Convey("Then return an error", func() {
+				So(err.Error(), ShouldEqual, "Invalid number of squares filled: expected a minimum of 17 clues found 16")
+			})
+		})
+
+		Convey("When Solve is called from the solver with a grid containing wrong number of different digits", func() {
+			_, err := solver.Solve(invalidNbDiffDigitsGrid)
+
+			Convey("Then return an error", func() {
+				So(err.Error(), ShouldEqual, "Invalid number of diffrent clues digits: expected a minimum of 8 different digits found 7")
 			})
 		})
 
