@@ -1,11 +1,8 @@
 package errors
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"net/http"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -44,9 +41,7 @@ func NewAPIError(status int, code string, params Params) *APIError {
 	// If it does, values are going to be change according to the template
 	if template, ok := templates[code]; ok {
 		message := template.Message
-		if len(message) == 0 {
-			message = ""
-		}
+
 		for key, value := range params {
 			message = strings.Replace(message, "{"+key+"}", fmt.Sprint(value), -1)
 		}
@@ -54,19 +49,4 @@ func NewAPIError(status int, code string, params Params) *APIError {
 	}
 
 	return err
-}
-
-// Send the error to the client
-func (a *APIError) Send(w http.ResponseWriter) {
-	w.Header().Add("Content-Type", "application/json")
-
-	resp, err := json.Marshal(a)
-
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		io.WriteString(w, `{"error": "Internal server error"}`)
-	}
-
-	w.WriteHeader(a.Status)
-	w.Write(resp)
 }

@@ -20,6 +20,7 @@ build:
           go get -u github.com/golang/lint/golint
           go get github.com/gorilla/mux
           go get github.com/braintree/manners
+          go get github.com/smartystreets/goconvey/convey
           go get gopkg.in/yaml.v2
 
     # Build the project
@@ -45,7 +46,7 @@ build:
     - script:
         name: Test
         code: |
-          go test -v -cover -coverprofile=coverage.out ./solver
+          ./test.sh
 
     - script:
         name: Coveralls.io

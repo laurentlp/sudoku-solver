@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/laurentlp/sudoku-solver/solver"
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 const grid = "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
@@ -19,58 +20,61 @@ const errorGrid = "4.....8.5.3..........7......2.....6.....8.4......1...."
 const emptyGrid = ""
 const wrongGrid = "..757..3.1....a.2.7...234......8x..4..7..4...49....6.5.42...3e....7..9....18....."
 
-func TestSolve(t *testing.T) {
-	sudoku, err := solver.Solve(grid)
+func TestSudokuSolving(t *testing.T) {
+	Convey("Given sudokus grid and a solver", t, func() {
+		Convey("When Solve is called from the solver with the grid\n", func() {
+			sudoku, err := solver.Solve(grid)
+			solver.Display(sudoku)
 
-	if err != nil {
-		t.Error("Error : ", err)
-	}
+			Convey("Then show a solved sudoku", func() {
+				So(err, ShouldBeNil)
+			})
+		})
 
-	solver.Display(sudoku)
-}
+		Convey("When Solve is called from the solver with the short grid", func() {
+			_, err := solver.Solve(errorGrid)
 
-func TestSolveErr(t *testing.T) {
-	_, err := solver.Solve(errorGrid)
+			Convey("Then return an error", func() {
+				So(err.Error(), ShouldEqual, fmt.Sprintf("Invalid grid size: expected grid size of 81 found grid size of %d", len(errorGrid)))
+			})
+		})
 
-	if err.Error() != "Invalid grid size: expected grid size of 81 found grid size of 54" {
-		t.Error("Error : ", err)
-	}
-}
+		Convey("When Solve is called from the solver with the empty grid", func() {
+			_, err := solver.Solve(emptyGrid)
 
-func TestSolveEmpty(t *testing.T) {
-	_, err := solver.Solve(emptyGrid)
+			Convey("Then return an error", func() {
+				So(err.Error(), ShouldEqual, fmt.Sprintf("Invalid grid size: expected grid size of 81 found grid size of %d", len(emptyGrid)))
+			})
+		})
 
-	if err.Error() != "Invalid grid size: expected grid size of 81 found grid size of 0" {
-		t.Error("Error : ", err)
-	}
-}
+		Convey("When Solve is called from the solver with an invalid grid", func() {
+			_, err := solver.Solve(invalidGrid)
 
-func TestSolveInvalid(t *testing.T) {
-	_, err := solver.Solve(invalidGrid)
+			Convey("Then return an error", func() {
+				So(err.Error(), ShouldEqual, "The sudoku contains errors and can not be solved")
+			})
+		})
 
-	if err.Error() != "The sudoku contains errors and can not be solved" {
-		t.Error("Error : ", err)
-	}
-}
+		Convey("When Solve is called from the solver with a grid containing wrong character", func() {
+			_, err := solver.Solve(wrongGrid)
 
-func TestSolveWrong(t *testing.T) {
-	_, err := solver.Solve(wrongGrid)
+			Convey("Then return an error", func() {
+				So(err.Error(), ShouldEqual, "The sudoku contains errors and can not be solved")
+			})
+		})
 
-	if err.Error() != "The sudoku contains errors and can not be solved" {
-		t.Error("Error : ", err)
-	}
-}
+		Convey("When Solve is called from the solver with the hardest grids\n", func() {
+			solveAll(fromFile("./_tests/hardest.txt"), "hardest", t)
+		})
 
-func TestSolveHardest(t *testing.T) {
-	solveAll(fromFile("./_tests/hardest.txt"), "hardest", t)
-}
+		Convey("When Solve is called from the solver with the top95 grids\n", func() {
+			solveAll(fromFile("./_tests/top95.txt"), "top95", t)
+		})
 
-func TestSolveTopSudoku(t *testing.T) {
-	solveAll(fromFile("./_tests/top95.txt"), "hard", t)
-}
-
-func TestSolveEasy(t *testing.T) {
-	solveAll(fromFile("./_tests/easy50.txt"), "easy", t)
+		Convey("When Solve is called from the solver with the easy50 grids\n", func() {
+			solveAll(fromFile("./_tests/easy50.txt"), "easy", t)
+		})
+	})
 }
 
 // compareSlices compare values of two 3D arrays.
@@ -167,6 +171,10 @@ func solveAll(grids []string, name string, t *testing.T) {
 			float64(n)/nanoconv(sum(times)), // Average hertz used to solve this type of sudoku
 			nanoconv(max(times)))            // The maximum time it took to solve one of the sudoku
 	}
+
+	Convey("Then be all solved", func() {
+		So(sudokuNumber, ShouldEqual, n)
+	})
 
 	if sudokuNumber != n {
 		t.Error("Not all the sudoku have been solved")

@@ -8,8 +8,6 @@ type APIError struct {
 	ErrorCode string `json:"error_code"`
 	// Message is the error message that may be displayed to end users
 	Message string `json:"message"`
-	// DeveloperMessage is the error message that is mainly meant for developers
-	DeveloperMessage string `json:"developer_message,omitempty"`
 	// Details specifies the additional error information
 	Details interface{} `json:"details,omitempty"`
 }
