@@ -77,7 +77,7 @@ func TestSudokuSolving(t *testing.T) {
 			_, err := solver.Solve(invalidNbDiffDigitsGrid)
 
 			Convey("Then return an error", func() {
-				So(err.Error(), ShouldEqual, "Invalid number of diffrent clues digits: expected a minimum of 8 different digits found 7")
+				So(err.Error(), ShouldEqual, "Invalid number of different clues digits: expected a minimum of 8 different digits found 7")
 			})
 		})
 
