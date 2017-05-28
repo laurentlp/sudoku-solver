@@ -114,7 +114,7 @@ func compareSlices2D(A map[string]bool, B []string) bool {
 
 	B = B[:len(A)] // Bounds-checking elimination
 	i := 0
-	for v, _ := range A {
+	for v := range A {
 		if v != B[i] {
 			return false
 		}
