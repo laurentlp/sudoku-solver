@@ -51,7 +51,7 @@ func TestCommonController(t *testing.T) {
 			})
 		})
 
-		Convey("When SendJSON is called from handler with invalid informations", func() {
+		Convey("When SendJSON is called from handler with invalid informations\n", func() {
 			mux.HandleFunc("/test2", func(w http.ResponseWriter, r *http.Request) {
 				info := make(chan int)
 				c.SendJSON(w, nil, &info, http.StatusOK)
@@ -70,7 +70,7 @@ func TestCommonController(t *testing.T) {
 			})
 		})
 
-		Convey("When SendJSON is called from handler with nil value", func() {
+		Convey("When SendJSON is called from handler with nil value\n", func() {
 			mux.HandleFunc("/test3", func(w http.ResponseWriter, r *http.Request) {
 				c.SendJSON(w, nil, nil, http.StatusOK)
 			})
@@ -88,7 +88,7 @@ func TestCommonController(t *testing.T) {
 			})
 		})
 
-		Convey("When SendJSON is called from handler with a code 400", func() {
+		Convey("When SendJSON is called from handler with a code 400\n", func() {
 			mux.HandleFunc("/test4", func(w http.ResponseWriter, r *http.Request) {
 				info := struct {
 					Something string `json:"something"`
@@ -109,7 +109,7 @@ func TestCommonController(t *testing.T) {
 			})
 		})
 
-		Convey("When MapJSON is called from handler with nothing", func() {
+		Convey("When MapJSON is called from handler with nothing\n", func() {
 			mux.HandleFunc("/test5", func(w http.ResponseWriter, r *http.Request) {
 				var model sudokubundle.Sudoku
 				err := c.MapJSON(w, r, &model)
@@ -131,7 +131,7 @@ func TestCommonController(t *testing.T) {
 			})
 		})
 
-		Convey("When MapJSON is called from handler with invalid JSON", func() {
+		Convey("When MapJSON is called from handler with invalid JSON\n", func() {
 			mux.HandleFunc("/test6", func(w http.ResponseWriter, r *http.Request) {
 				var model sudokubundle.Sudoku
 				err := c.MapJSON(w, r, &model)
@@ -153,7 +153,7 @@ func TestCommonController(t *testing.T) {
 			})
 		})
 
-		Convey("When MapJSON is called from handler with to much data", func() {
+		Convey("When MapJSON is called from handler with to much data\n", func() {
 			mux.HandleFunc("/test7", func(w http.ResponseWriter, r *http.Request) {
 				var model sudokubundle.Sudoku
 				err := c.MapJSON(w, r, &model)

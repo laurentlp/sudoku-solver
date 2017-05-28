@@ -26,6 +26,7 @@ func TestSudokuSolving(t *testing.T) {
 	Convey("Given sudokus grid and a solver", t, func() {
 		Convey("When Solve is called from the solver with a grid\n", func() {
 			sudoku, err := solver.Solve(grid)
+			fmt.Println()
 			solver.Display(sudoku)
 
 			Convey("Then show a solved sudoku", func() {
