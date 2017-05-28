@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/braintree/manners"
@@ -30,27 +31,19 @@ func main() {
 	s.HandleFunc("/sudoku", sudoku.Solve).Methods("POST")
 
 	// Create new Gracefulserver and bind listin address and handlers
-	server := manners.NewServer()
-	server.Addr = ":8080"
-	server.Handler = r
-
-	go func(s *manners.GracefulServer) {
-		err := s.ListenAndServe()
+	go func(r http.Handler) {
+		manners.ListenAndServe(":8080", r)
 
 		log.Println("The api is shutting down...")
 
-		if err != nil {
-			panic(err)
-		}
+	}(r)
 
-	}(server)
-
-	fmt.Println("Api started on localhost", server.Addr)
+	fmt.Println("Api started on localhost:8080")
 
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Press enter to stop server...")
 	reader.ReadString('\n')
 
 	fmt.Print("Server stopping...")
-	server.Close()
+	manners.Close()
 }

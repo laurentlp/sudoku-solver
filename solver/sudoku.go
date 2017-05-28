@@ -133,7 +133,7 @@ func gridValues(grid string) (map[string]string, error) {
 	} else if nbClues < 17 {
 		return nil, fmt.Errorf("Invalid number of squares filled: expected a minimum of 17 clues found %d", nbClues)
 	} else if len(diffDigits) < 8 {
-		return nil, fmt.Errorf("Invalid number of diffrent clues digits: expected a minimum of 8 different digits found %d", len(diffDigits))
+		return nil, fmt.Errorf("Invalid number of different clues digits: expected a minimum of 8 different digits found %d", len(diffDigits))
 	}
 
 	// Map the square value to it's corresponding key (A1, B5, D8,...)

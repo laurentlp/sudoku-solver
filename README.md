@@ -12,6 +12,26 @@ A simple golang sudoku solver using Peter Norvig algorithm
 $ go get github.com/laurentlp/sudoku-solver
 ```
 
+## To install the dependencies (Tests + API)
+
+### Install glide (Package Management for Golang)
+
+```shell
+$ curl https://glide.sh/get | sh
+```
+
+Or via Homebrew on MacOS
+
+```shell
+$ brew install glide
+```
+
+Then to install the dependencies the dependencies
+
+```shell
+$ glide i
+```
+
 ## Running the tests
 
 ### Test the solver
@@ -38,7 +58,7 @@ $ chmod 777 test.sh
 
 ## API
 
-To use the api, simply run the `main.go` file in the command line.
+To use the API, simply run the `main.go` file in the command line.
 Then enter your sudoku in the body of the request as shown bellow :
 
 Make a POST request to `http://localhost:8080/sudoku`
@@ -87,6 +107,7 @@ You should see an output looking like this :
 
 ```bash
 $ go run main.go
+
 4 1 7 | 3 6 9 | 8 2 5
 6 3 2 | 1 5 8 | 9 4 7
 9 5 8 | 7 2 4 | 3 1 6

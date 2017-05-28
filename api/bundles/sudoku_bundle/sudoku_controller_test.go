@@ -13,7 +13,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestControllerSpec(t *testing.T) {
+func TestSudokuController(t *testing.T) {
 	Convey("Given a running server and a controller instance", t, func() {
 		// load error messages
 		if err := errors.LoadErrors("../../errors/error_templates.yaml"); err != nil {
@@ -67,7 +67,7 @@ func TestControllerSpec(t *testing.T) {
 			})
 		})
 
-		Convey("When Solve is called from handler with nothing", func() {
+		Convey("When Solve is called from handler with nothing\n", func() {
 			mux.HandleFunc("/sudoku", c.Solve)
 
 			reader := strings.NewReader(``)
