@@ -21,25 +21,29 @@ func (c *Controller) SendJSON(w http.ResponseWriter, r *http.Request, v interfac
 
 	j, err := json.Marshal(v)
 
-	if err != nil {
+	if err != nil || string(j) == "null" {
 		log.Print(fmt.Sprintf("Error while encoding JSON: %v", err))
 		w.WriteHeader(http.StatusInternalServerError)
 		io.WriteString(w, `{"error": "Internal server error"}`)
-	} else {
-		w.WriteHeader(code)
-		io.WriteString(w, string(j))
+		return
 	}
+
+	w.WriteHeader(code)
+	io.WriteString(w, string(j))
 }
 
 // MapJSON marshals v to a json struct
-// Return true if succesful, false otherwise
+// Return nil if succesful, an error otherwise
 func (c *Controller) MapJSON(w http.ResponseWriter, r *http.Request, v interface{}) *errors.APIError {
+	// Maximum size of the response body is 100 bytes
+	r.Body = http.MaxBytesReader(w, r.Body, 100<<(1))
+
 	bodyBuffer, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
 		log.Println(fmt.Sprintf("Error while reading response body: %v", err))
 
-		errors.BadRequest("The informations sent to the server contains errors.")
+		return errors.BadRequest("The informations sent to the server contains errors.")
 	} else if len(bodyBuffer) == 0 {
 		log.Println("Body is empty:")
 

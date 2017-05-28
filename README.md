@@ -29,11 +29,12 @@ Then enter your sudoku in the body of the request as shown bellow :
 Make a POST request to `http://localhost:8080/sudoku`
 
 with the body (JSON) :
-    ```json
+
+```json
     {
         "sudoku" : "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
     }
-    ```
+```
 
 Result :
 
@@ -49,19 +50,19 @@ First create a separate go project in which you will need a `main.go` file
     import (
         "fmt"
 
-        "github.com/laurentlp/sudoku-solver/sudoku"
+        "github.com/laurentlp/sudoku-solver/solver"
     )
 
     func main() {
         // Directly write a sudoku grid or use a file as shown in the examples folder
         grid := "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
-        resolved, err := sudoku.Solve(grid)
+        resolved, err := solver.Solve(grid)
 
         if err != nil {
             fmt.Print(err)
         }
 
-        sudoku.Display(resolved)
+        solver.Display(resolved)
     }
 ```
 
