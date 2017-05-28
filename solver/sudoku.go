@@ -107,7 +107,7 @@ func gridValues(grid string) (map[string]string, error) {
 
 	// The number of clues given in the grid
 	nbClues := 0
-	diffDigits := make([]string, 0)
+	var diffDigits []string
 
 	// For each square
 	for i := 0; i < len(grid); i++ {
